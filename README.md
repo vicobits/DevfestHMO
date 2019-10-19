@@ -1,2 +1,2 @@
-# Planttillas Docker - Devfest Hermosillo
+### Planttillas Docker
 docker templates
