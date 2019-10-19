@@ -1,0 +1,50 @@
+version: "2"
+
+services:
+
+  database:
+    image: postgres:9.6
+    restart: always
+    environment:
+      - POSTGRES_USER=drone
+      - POSTGRES_PASSWORD=drone
+      - POSTGRES_DB=drone
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+
+  drone-server:
+    container_name: drone-server
+    image: drone/drone:1
+    restart: always
+    ports:
+      - 8000:80
+      - 4430:443
+    volumes:
+      - /opt/volumes/drone:/var/lib/drone:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_GITHUB_SERVER=https://github.com
+      - DRONE_GITHUB_CLIENT_ID=7ecb97791d1fcff0a1a6
+      - DRONE_GITHUB_CLIENT_SECRET=992aeaae82109a6ac3f3c5190fcea50f860ec3c8
+      - DRONE_RUNNER_CAPACITY=2
+      - DRONE_SERVER_HOST=drone.oep.xyz
+      - DRONE_LOGS_DEBUG=true
+      - DRONE_SERVER_PROTO=https
+      - DRONE_TLS_AUTOCERT=false
+      - DRONE_RPC_SECRET=jEsjIqrs5Sz6U9qocuUUkYq9D038ECOQ9FjwgLWohHBEJMmbYHJE22ZXSf7G5AQw
+      - DRONE_DATABASE_DRIVER=postgres
+      - DRONE_DATABASE_DATASOURCE=postgres://drone:drone@database:5432/postgres?sslmode=disable
+      - DRONE_USER_CREATE=username:vicobits,admin:true
+
+  drone-agent:
+    container_name: drone-agent
+    image: drone/agent:latest
+    restart: always
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_RPC_SERVER=drone-server:8000
+      - DRONE_RPC_SECRET=jEsjIqrs5Sz6U9qocuUUkYq9D038ECOQ9FjwgLWohHBEJMmbYHJE22ZXSf7G5AQw
+      - DRONE_DEBUG=true

@@ -1,0 +1,53 @@
+
+version: '2'
+
+services:
+  database:
+    image: postgres:9.6
+    restart: always
+    environment:
+      - POSTGRES_USER=drone
+      - POSTGRES_PASSWORD=drone
+      - POSTGRES_DB=drone
+    volumes:
+      - /opt/drone/postgres:/var/lib/postgresql/data
+
+  drone-server:
+    image: drone/drone:1
+    container_name: drone-server
+    restart: always
+    ports:
+      - 8000:80
+      - 4430:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/drone/data:/var/lib/drone:rw
+    environment:
+      - DRONE_AGENTS_ENABLED=true
+      - DRONE_GITLAB_SERVER=https://gitlab.com
+      - DRONE_GITLAB_CLIENT_ID=8f140f0c84d960e901974596c355d586408710e1a1309f455a9e2ea2d1c42a93
+      - DRONE_GITLAB_CLIENT_SECRET=344f627077fd5681daac6a847279029dcb5db6331842324e500ef35f9a352e6a
+      - DRONE_RUNNER_CAPACITY=2
+      - DRONE_SERVER_HOST=drone.oep.xyz
+      - DRONE_SERVER_PROTO=https
+      - DRONE_TLS_AUTOCERT=false
+      - DRONE_RPC_SECRET=jEsjIqrs5Sz6U9qocuUUkYq9D038ECOQ9FjwgLWohHBEJMmbYHJE22ZXSf7G5AQw
+      - DRONE_DATABASE_DRIVER=postgres
+      - DRONE_DATABASE_DATASOURCE=postgres://drone:drone@database:5432/postgres?sslmode=disable
+      - DRONE_USER_CREATE=username:vicobits,admin:true
+      - DRONE_LOGS_TRACE=true
+
+  drone-agent:
+    container_name: drone-agent
+    image: drone/agent:latest
+    restart: always
+    depends_on:
+      - drone-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DRONE_SERVER_HOST=drone-server
+      - DRONE_RPC_SERVER=drone-server
+      - DRONE_RPC_SECRET=jEsjIqrs5Sz6U9qocuUUkYq9D038ECOQ9FjwgLWohHBEJMmbYHJE22ZXSf7G5AQw
+      - DRONE_LOGS_TRACE=true
+      - DRONE_TRACE=true
