@@ -1,2 +1,2 @@
-### Planttillas Docker
+### Plantillas Docker
 docker templates
