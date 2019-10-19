@@ -27,7 +27,7 @@ services:
       - DRONE_GITHUB_CLIENT_ID=7ecb97791d1fcff0a1a6
       - DRONE_GITHUB_CLIENT_SECRET=992aeaae82109a6ac3f3c5190fcea50f860ec3c8
       - DRONE_RUNNER_CAPACITY=2
-      - DRONE_SERVER_HOST=drone.oep.xyz
+      - DRONE_SERVER_HOST=drone.xib.li
       - DRONE_LOGS_DEBUG=true
       - DRONE_SERVER_PROTO=https
       - DRONE_TLS_AUTOCERT=false
